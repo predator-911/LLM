@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rag-app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=llama3-8b-8192
+      - EMBEDDING_MODEL=all-MiniLM-L6-v2
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - CHUNK_SIZE=1000
+      - CHUNK_OVERLAP=200
+      - DEFAULT_TOP_K=5
+      - SIMILARITY_THRESHOLD=0.7
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  app_data:
+    driver: local
